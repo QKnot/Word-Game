@@ -37,6 +37,14 @@
                     <option value="120">2 Minutes</option>
                 </select>
             </div>
+            <div class="difficulty-selection">
+                <label for="difficulty">Select Difficulty:</label>
+                <select id="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
             <button id="startGameButton" onclick="startGame()">Start Game</button>
         </div>
 
@@ -47,6 +55,20 @@
                     <span id="playerDisplay"></span>
                     <div class="timer" id="timer">Time: 30s</div>
                 </div>
+                <div class="game-stats">
+                    <div class="stat-box">
+                        <div id="streakDisplay">Streak: 0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div id="pointsDisplay">Points: 0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div id="highScoreDisplay">High Score: 0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div id="correctWordsDisplay">Correct Words: 0</div>
+                    </div>
+                </div>
                 <div class="used-words" id="usedWords">
                     Used words will appear here
                 </div>
@@ -55,14 +77,15 @@
             <div class="game-controls">
                 <input type="text" id="wordInput" placeholder="Enter a word" autocomplete="off">
                 <button id="submitButton" onclick="submitWord()">Submit</button>
+                <button id="hintButton" class="hint-button" onclick="getHint()">Get Hint (-5 points)</button>
             </div>
 
             <div class="message" id="message"></div>
             <div class="history" id="history">Game history will appear here</div>
             
             <div class="game-actions">
-                <button id="newGameButton" onclick="resetGame()" style="display: none;">New Game</button>
-                <button id="downloadPDF" onclick="generatePDF()" style="display: none;">Download Game History</button>
+                <button id="newGameButton" class="action-button new-game" onclick="resetGame()" style="display: none;">New Game</button>
+                <button id="downloadPDF" class="action-button download" onclick="generatePDF()" style="display: none;">Download Game History</button>
             </div>
         </div>
     </div>
