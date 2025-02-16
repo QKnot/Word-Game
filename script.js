@@ -470,3 +470,166 @@ function initializeMobileOptimizations() {
     }, { passive: false });
 }
 document.addEventListener('DOMContentLoaded', initializeMobileOptimizations);
+function enhanceMobileExperience() {
+    const wordInput = document.getElementById('wordInput');
+    const container = document.querySelector('.container');
+    const gameArea = document.getElementById('gameArea');
+    const submitButton = document.getElementById('submitButton');
+    
+    // Fix 1: Proper viewport height handling for mobile browsers
+    function setMobileHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        container.style.minHeight = `calc(var(--vh, 1vh) * 100)`;
+    }
+    
+    // Fix 2: Improve input handling on mobile
+    function enhanceMobileInput() {
+        // Prevent zoom on input focus for iOS
+        wordInput.style.fontSize = '16px';
+        
+        // Add touch event handling
+        wordInput.addEventListener('touchstart', function(e) {
+            if (gameActive) {
+                e.preventDefault();
+                this.focus();
+            }
+        });
+        
+        // Improve virtual keyboard handling
+        wordInput.addEventListener('blur', function() {
+            // Small delay to allow button clicks to register
+            setTimeout(() => {
+                if (gameActive) {
+                    window.scrollTo(0, 0);
+                }
+            }, 100);
+        });
+    }
+    
+    // Fix 3: Scroll management
+    function manageScroll() {
+        const gameElements = document.querySelectorAll('.history, .used-words');
+        
+        gameElements.forEach(element => {
+            element.addEventListener('touchstart', function(e) {
+                const scrollTop = element.scrollTop;
+                const scrollHeight = element.scrollHeight;
+                const height = element.clientHeight;
+                const deltaY = e.touches[0].clientY;
+                
+                if (scrollTop === 0 && deltaY > 0) {
+                    e.preventDefault();
+                }
+                
+                if (scrollHeight - scrollTop === height && deltaY < 0) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        });
+    }
+    
+    // Fix 4: Prevent double-tap zoom
+    function preventDoubleTapZoom() {
+        let lastTap = 0;
+        document.addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 500 && tapLength > 0) {
+                e.preventDefault();
+            }
+            lastTap = currentTime;
+        });
+    }
+    
+    // Fix 5: Improve button touch response
+    function enhanceButtonResponse() {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            button.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+                // Add slight delay for visual feedback
+                setTimeout(() => {
+                    if (this.id === 'submitButton') {
+                        submitWord();
+                    }
+                }, 50);
+            });
+        });
+    }
+    
+    // Fix 6: Keyboard visibility handling
+    function handleKeyboardVisibility() {
+        const originalHeight = window.innerHeight;
+        
+        window.addEventListener('resize', () => {
+            if (window.innerHeight < originalHeight) {
+                // Keyboard is visible
+                gameArea.style.paddingBottom = '20vh';
+            } else {
+                // Keyboard is hidden
+                gameArea.style.paddingBottom = '0';
+            }
+        });
+    }
+    
+    // Initialize all mobile optimizations
+    setMobileHeight();
+    enhanceMobileInput();
+    manageScroll();
+    preventDoubleTapZoom();
+    enhanceButtonResponse();
+    handleKeyboardVisibility();
+    
+    // Update height on orientation change and resize
+    window.addEventListener('resize', setMobileHeight);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(setMobileHeight, 100);
+    });
+}
+
+// Add corresponding CSS rules
+const mobileStyles = `
+    @media (max-width: 768px) {
+        .container {
+            padding: 12px;
+            min-height: calc(var(--vh, 1vh) * 100);
+        }
+        
+        .game-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-background);
+            padding: 12px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-area {
+            padding-bottom: 160px;
+        }
+        
+        input, button {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+        
+        .history, .used-words {
+            -webkit-overflow-scrolling: touch;
+            max-height: 25vh;
+        }
+    }
+`;
+
+// Add the styles to the document
+const styleSheet = document.createElement('style');
+styleSheet.textContent = mobileStyles;
+document.head.appendChild(styleSheet);
+
+// Initialize mobile optimizations when the DOM is ready
+document.addEventListener('DOMContentLoaded', enhanceMobileExperience);
